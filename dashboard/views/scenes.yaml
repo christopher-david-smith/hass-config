@@ -1,0 +1,38 @@
+# lovelace_gen
+
+type: custom:layout-card
+layout_type: custom:grid-layout
+layout:
+  margin: 0
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr))
+cards:
+
+  - type: custom:button-card
+    template: header_h2
+    name: Scenes
+    view_layout:
+      grid-column: 1/-1
+
+  - type: custom:auto-entities
+    filter:
+      include:
+        - domain: scene
+    card:
+      type: entities
+    view_layout:
+      grid-column: span 2
+
+  - type: custom:button-card
+    template: header_h2
+    name: Automations
+    view_layout:
+      grid-column: 1/-1
+
+  - type: custom:auto-entities
+    filter:
+      include:
+        - domain: automation
+    card:
+      type: entities
+    view_layout:
+      grid-column: span 2

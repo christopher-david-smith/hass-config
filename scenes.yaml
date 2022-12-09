@@ -1,0 +1,22 @@
+- id: '1670434175284'
+  name: Evening lighting
+  entities:
+    light.living_room_corner_light:
+      supported_color_modes:
+      - onoff
+      friendly_name: Corner Light
+      supported_features: 0
+      color_mode: onoff
+      state: 'on'
+    light.living_room_main_light:
+      supported_color_modes:
+      - onoff
+      friendly_name: Main Light
+      supported_features: 0
+      state: 'off'
+  icon: mdi:lightbulb-multiple
+  metadata:
+    light.living_room_corner_light:
+      entity_only: true
+    light.living_room_main_light:
+      entity_only: true

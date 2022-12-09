@@ -1,0 +1,41 @@
+# lovelace_gen
+
+type: custom:layout-card
+layout_type: custom:grid-layout
+layout:
+  margin: 0
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr))
+cards:
+
+  - type: custom:button-card
+    template:
+      - header_h2
+    name: People
+    view_layout:
+      grid-column: 1/-1
+
+  {% for person in _global.people %}
+  - type: custom:mushroom-person-card
+    entity: {{ person }}
+  {% endfor %}
+
+  - type: custom:button-card
+    template:
+      - header_h2
+    name: Map
+    view_layout:
+      grid-column: 1/-1
+
+  - type: map
+    auto_fit: true
+    entities:
+    {% for person in _global.people %}
+      - {{ person }}
+    {% endfor %}
+    view_layout:
+      grid-column: 1/span 2
+    card_mod:
+      style: |
+        ha-map {
+          position: inherit !important;
+        }

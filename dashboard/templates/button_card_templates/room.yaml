@@ -1,0 +1,102 @@
+room:
+  triggers_update: all
+  variables:
+    highlight: false
+    entities: []
+    _enabled_entity_icons: >
+      [[[
+        return function(variables) {
+
+          // If no entities have been set, return an empty array
+          if (!Array.isArray(variables.entities)) {
+            return [];
+          }
+
+          // Otherwise, loop over each entity, identify if it is turned on
+          // or not, and if it is turned on, store the items associated icon
+          var active_entities = [];
+          for (const item of variables.entities) {
+            for (const entity of item.entities) {
+
+              var attribute = states[entity].state;
+              if (item.attribute) {
+                attribute = states[entity].attributes[item.attribute];
+              }
+
+              if (['on', 'playing', 'heating'].includes(attribute)) {
+                active_entities.push(item.icon);
+                break;
+              }
+            }
+          }
+
+          return active_entities;
+
+        }
+      ]]]
+
+  size: 20px
+  show_state: true
+  show_label: true
+  styles:
+    grid:
+      - grid-template-areas: |
+          "icons temperature temperature"
+          "l l l"
+          "n n i"
+      - grid-template-columns: 1fr 1fr min-content
+    card:
+      - padding: 0
+      - background: >
+          [[[
+          if(variables.highlight) {
+            return 'var(--primary-color)';
+          }
+          ]]]
+    name:
+      - font-size: var(--body-font-size)
+      - padding: 4px 4px 12px 12px
+      - white-space: nowrap 
+      - text-align: left
+      - justify-self: start
+      - align-self: end
+    img_cell:
+      - align-self: end
+      - text-align: right
+      - padding: 4px 8px 8px 8px
+      - height: 28px
+    custom_fields:
+      icons:
+        - height: 20px
+        - justify-self: start
+        - padding: 8px
+        - color: >
+            [[[
+            if(variables.highlight) {
+              return 'var(--secondary-color)';
+            } else {
+              return 'var(--label-badge-red)';
+            }
+            ]]]
+      temperature:
+        - font-size: 0.8rem
+        - justify-self: end
+        - text-align: right
+        - padding: 8px
+  custom_fields:
+    icons: > 
+      [[[
+        var enabled = variables._enabled_entity_icons(variables);
+        var icons = [];
+        for (const icon of enabled) {
+          icons.push(`<ha-icon icon="${icon}" style="width: 15px"></ha-icon>`);
+        }
+        return icons.join(" ");
+      ]]]
+
+    temperature: >
+      [[[
+        if(variables.temperature) {
+          return states[variables.temperature].state.split('.')[0] + '°C';
+        }
+      ]]]

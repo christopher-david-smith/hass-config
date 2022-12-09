@@ -1,0 +1,67 @@
+base_icon:
+  show_name: false
+  show_label: false
+  aspect_ratio: 1/1
+  styles:
+    grid:
+      - grid-template-areas: 'i'
+    img_cell:
+      - width: 30%
+    icon:
+      - width: 100%
+
+base_icon_with_color:
+  variables:
+    highlight: false
+  template:
+    - base_icon
+    - colors
+  styles:
+    card:
+      - border: >
+          [[[
+          if(variables.highlight) {
+            return 0;
+          }
+          ]]]
+      - background-color: >
+          [[[
+          if(variables.highlight) {
+            return variables.selected_color(variables);
+          }
+          ]]]
+    icon:
+      - color: >
+          [[[
+            if(variables.highlight) {
+              return 'white';
+            } else {
+              return variables.selected_color(variables);
+            }
+          ]]]
+
+icon_small:
+  styles:
+    card:
+      - height: 40px
+      - width: 40px
+
+icon_medium:
+  styles:
+    card:
+      - height: 60px
+      - width: 60px
+
+icon_large:
+  styles:
+    card:
+      - height: 80px
+      - width: 80px
+
+icon_home:
+  template:
+    - icon_small
+  icon: mdi:home
+  tap_action:
+    action: navigate
+    navigation_path: home

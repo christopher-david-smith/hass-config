@@ -1,0 +1,39 @@
+- id: '1670520820732'
+  alias: Washing Machine
+  description: Toggle a boolean when the washing machine starts and stops, and send
+    a notification when the washing machine has finished
+  use_blueprint:
+    path: sbyx/notify-or-do-something-when-an-appliance-like-a-dishwasher-or-washing-machine-finishes.yaml
+    input:
+      power_sensor: sensor.washing_machine_active_power
+      pre_actions:
+      - service: input_boolean.turn_on
+        data: {}
+        target:
+          entity_id: input_boolean.washing_machine_running
+      actions:
+      - service: notify.all_phones
+        data:
+          message: "The washing machine has finished \U0001F44D"
+      - service: input_boolean.turn_off
+        data: {}
+        target:
+          entity_id: input_boolean.washing_machine_running
+- id: '1670520910542'
+  alias: Dishwasher
+  description: Toggle a boolean when the dishwasher starts and stops
+  use_blueprint:
+    path: sbyx/notify-or-do-something-when-an-appliance-like-a-dishwasher-or-washing-machine-finishes.yaml
+    input:
+      power_sensor: sensor.dishwasher_active_power
+      pre_actions:
+      - service: input_boolean.turn_on
+        data: {}
+        target:
+          entity_id: input_boolean.dishwasher_running
+      actions:
+      - service: input_boolean.turn_off
+        data: {}
+        target:
+          entity_id:
+          - input_boolean.dishwasher_running

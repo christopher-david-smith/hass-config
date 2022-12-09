@@ -1,0 +1,43 @@
+# lovelace_gen
+
+type: custom:layout-card
+layout_type: custom:grid-layout
+layout:
+  margin: 0
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr))
+cards:
+
+  - type: custom:button-card
+    template:
+      - header_h2
+    name: Alarm
+    view_layout:
+      grid-column: 1/-1
+
+  - type: custom:mushroom-alarm-control-panel-card
+    entity: alarm_control_panel.home
+    view_layout:
+      grid-column: span 2
+    states:
+      - armed_away
+      - disarmed
+
+  - type: custom:swipe-card
+    view_layout:
+      grid-column: 1/span 2
+    parameters:
+      pagination:
+        type: fraction 
+      spaceBetween: 5
+    cards:
+    {% for camera in _global.cameras %}
+      - type: vertical-stack
+        cards:
+          - type: custom:button-card
+            template: header_h2
+            name: Camera // {{ camera.name }}
+          - type: custom:webrtc-camera
+            url: {{ camera.url }}
+            background: true
+            ui: true
+    {% endfor %}

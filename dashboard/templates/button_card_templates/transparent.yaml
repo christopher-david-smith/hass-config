@@ -1,0 +1,7 @@
+transparent:
+  styles:
+    card:
+      - background-color: rgba(0, 0, 0, 0)
+      - box-shadow: none
+      - border-radius: 0
+      - border-width: 0

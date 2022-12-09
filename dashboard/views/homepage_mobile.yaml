@@ -1,0 +1,163 @@
+# lovelace_gen
+
+type: custom:layout-card
+layout_type: custom:grid-layout
+layout:
+  margin: 0
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr))
+cards:
+
+  - type: custom:button-card
+    template: header_h2
+    name: Quick Links
+    view_layout:
+      grid-column: 1/-1
+
+  - type: custom:layout-card
+    layout_type: custom:grid-layout
+    layout:
+      grid-template-columns: repeat(auto-fit, minmax(50px, 1fr))
+      margin: -4px
+      mediaquery:
+        "(min-width: 400px) and (max-width: 800px)":
+          grid-template-columns: repeat(5, 75px)
+    view_layout:
+      grid-column: 1/-1
+    cards:
+      - type: custom:button-card
+        template:
+          - base_icon_with_color
+        variables:
+          color: red
+          {% if options.title == 'Security' %}
+          highlight: true
+          {% endif %}
+        icon: mdi:security
+        tap_action:
+          action: navigate
+          navigation_path: Security
+
+      - type: custom:button-card
+        template:
+          - base_icon_with_color
+        variables:
+          {% if options.title == 'People' %}
+          highlight: true
+          {% endif %}
+          color: blue
+        icon: mdi:account-multiple
+        tap_action:
+          action: navigate
+          navigation_path: People
+
+      - type: custom:button-card
+        template:
+          - base_icon_with_color
+        variables:
+          color: green
+          {% if options.title == 'Scenes' %}
+          highlight: true
+          {% endif %}
+        icon: mdi:movie-open
+        tap_action:
+          action: navigate
+          navigation_path: Scenes
+
+      - type: custom:button-card
+        template:
+          - base_icon_with_color
+        variables:
+          color: orange
+          {% if options.title == 'Schedule' %}
+          highlight: true
+          {% endif %}
+        icon: mdi:home-clock
+        tap_action:
+          action: navigate
+          navigation_path: Schedule
+
+      - type: custom:button-card
+        template:
+          - base_icon_with_color
+        variables:
+          color: pink
+        icon: mdi:cog
+        tap_action:
+          action: navigate
+          navigation_path: /config/dashboard
+
+  - type: custom:button-card
+    template: header_h2
+    name: Rooms
+    view_layout:
+      grid-column: 1/-1
+
+  - type: custom:button-card
+    template:
+      - room
+    name: Home
+    icon: mdi:home
+    tap_action:
+      action: navigate
+      navigation_path: Home
+    variables:
+      {% if options.title == 'Home' %}
+      highlight: true
+      {% else %}
+      highlight: false
+      {% endif %}
+    view_layout:
+      show:
+        mediaquery: "(min-width: 800px)"
+  {% for room in _global.rooms %}
+  - type: custom:button-card
+    template:
+      - room
+    name: {{ room.name }}
+    icon: {{ room.icon }}
+    tap_action:
+      action: navigate
+      navigation_path: {{ room.name }}
+    variables:
+      {% if room.name == options.title %}
+      highlight: true
+      {% endif %}
+      temperature: {{ room.temperature }}
+      entities:
+
+        {% if room.lights %}
+        - icon: 'mdi:lightbulb-multiple'
+          entities:
+            {% for entity in room.lights %}
+            - {{ entity }}
+            {% endfor %}
+        {% endif %}
+
+        {% if room.media %}
+        - icon: 'mdi:radio'
+          entities:
+            {% for entity in room.media %}
+            - {{ entity }}
+            {% endfor %}
+        {% endif %}
+
+        {% if room.thermostat %}
+        - icon: 'mdi:fire'
+          attribute: 'hvac_action'
+          entities:
+            {% for entity in room.thermostat %}
+            - {{ entity }}
+            {% endfor %}
+        {% endif %}
+
+        {% if room.other %}
+          {% for item in room.other %}
+        - icon: {{ item.icon }}
+          entities:
+            {% for entity in item.entities %}
+            - {{ entity }}
+            {% endfor %}
+          {% endfor %}
+        {% endif %}
+
+  {% endfor %}
