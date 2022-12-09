@@ -1,10 +1,17 @@
 *
 
-!*.yaml
 !.gitignore
-!*.md
+!README.md
+
+!automations.yaml
+!configuration.yaml
+!scenes.yaml
+!scripts.yaml
+!ui-lovelace.yaml
+
 !dashboard/
 !dashboard/**/*
+
 !blueprints
 !blueprints/**/*
 blueprints/*/homeassistant/*
@@ -12,7 +19,3 @@ blueprints/*/homeassistant/*
 .storage
 .cloud
 .google.token
-
-ip_bans.yaml
-secrets.yaml
-known_devices.yaml
