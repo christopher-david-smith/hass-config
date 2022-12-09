@@ -4,7 +4,10 @@
 !.gitignore
 !*.md
 !dashboard/
-!dashboard/**/
+!dashboard/**/*
+!blueprints
+!blueprints/**/*
+blueprints/*/homeassistant/*
 
 .storage
 .cloud
