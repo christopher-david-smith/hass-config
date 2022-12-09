@@ -7,10 +7,11 @@
 !configuration.yaml
 !scenes.yaml
 !scripts.yaml
-!ui-lovelace.yaml
 
-!dashboard/
-!dashboard/**/*
+!packages/
+
+!dashboards/
+!dashboards/**/*
 
 !blueprints
 !blueprints/**/*

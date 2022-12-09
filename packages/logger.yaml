@@ -1,0 +1,6 @@
+logger:
+  default: warning
+
+  filters:
+    homassistant.loader:
+      - "We found a custom integration"

@@ -1,0 +1,5 @@
+lovelace-default:
+  mode: yaml
+  filename: dashboards/default/dashboard.yaml
+  title: Dashboard
+  show_in_sidebar: true

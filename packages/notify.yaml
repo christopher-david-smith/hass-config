@@ -1,0 +1,6 @@
+notify:
+  - name: all_phones
+    platform: group
+    services:
+      - service: mobile_app_chris
+      - service: mobile_app_bex
