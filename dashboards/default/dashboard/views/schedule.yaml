@@ -23,6 +23,8 @@ cards:
       - light
       - media_player
       - scene
+      - person
+      - switch.kitchen_coffee_machine
     sort_by:
       - state
-      - relative-tim
+      - relative-time
