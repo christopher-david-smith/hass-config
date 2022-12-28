@@ -5,7 +5,7 @@
   use_blueprint:
     path: sbyx/notify-or-do-something-when-an-appliance-like-a-dishwasher-or-washing-machine-finishes.yaml
     input:
-      power_sensor: sensor.washing_machine_active_power
+      power_sensor: sensor.washing_machine_power
       pre_actions:
       - service: input_boolean.turn_on
         data: {}
@@ -25,7 +25,7 @@
   use_blueprint:
     path: sbyx/notify-or-do-something-when-an-appliance-like-a-dishwasher-or-washing-machine-finishes.yaml
     input:
-      power_sensor: sensor.dishwasher_active_power
+      power_sensor: sensor.dishwasher_power
       pre_actions:
       - service: input_boolean.turn_on
         data: {}
