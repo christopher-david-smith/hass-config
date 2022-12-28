@@ -1,0 +1,57 @@
+- type: vertical-stack
+  cards:
+    - type: custom:button-card
+      template: header_h2
+      name: Home
+    - type: custom:layout-card
+      layout_type: custom:grid-layout
+      layout: !include ../templates/columns.yaml
+      cards:
+        - type: button
+          entity: switch.adguard_home_filtering
+          name: AdGuard
+        - type: button
+          entity: input_boolean.guests
+
+- type: vertical-stack
+  cards:
+    - type: custom:button-card
+      template: header_h2
+      name: Updates 
+    - type: custom:layout-card
+      layout_type: custom:grid-layout
+      layout: !include ../templates/columns.yaml
+      cards:
+        - type: entities
+          entities:
+            - entity: update.home_assistant_core_update
+              state_color: true
+              name: Core
+            - entity: update.home_assistant_operating_system_update
+              name: System
+            - entity: update.home_assistant_supervisor_update
+              name: Supervisor
+            - entity: sensor.hacs
+              name: HACS
+          view_layout:
+            grid-column: 1/-1
+
+- type: vertical-stack
+  cards:
+    - type: custom:button-card
+      template: header_h2
+      name: Network
+    - type: custom:mini-graph-card
+      entities:
+        - sensor.speedtest_download
+      show:
+        name: false
+        icon: false
+    - type: custom:gap-card
+      height: 10
+    - type: custom:mini-graph-card
+      entities:
+        - sensor.speedtest_upload
+      show:
+        name: false
+        icon: false

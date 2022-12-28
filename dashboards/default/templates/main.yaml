@@ -1,0 +1,131 @@
+# lovelace_gen
+
+title: {{ title }}
+icon: {{ icon }}
+path: {{ path }}
+type: custom:grid-layout
+layout:
+  height: calc(100% - 4px)
+  grid-template-columns: minmax(8px, 1fr) minmax(1px, 500px) minmax(8px, 1fr)
+  grid-template-areas: |
+    ". mobile ."
+  mediaquery:
+    "(min-width: 800px)":
+      grid-template-columns: 8px 400px 16px auto 8px
+      grid-template-areas: |
+        ". mobile . desktop ."
+cards:
+  
+  # Sidebar, shown in desktop mode
+  - type: custom:mod-card
+    card_mod:
+      style: |
+        ha-card {
+          height: 100%;
+          background: #101111;
+          padding-right: 12px;
+        }
+    view_layout:
+      grid-area: mobile
+      show:
+        mediaquery: "(min-width: 800px)"
+    card:
+      type: custom:layout-card
+      layout_type: custom:grid-layout
+      layout:
+        margin: 0
+      cards:
+        - type: custom:layout-card
+          layout_type: custom:grid-layout
+          layout: 
+            margin: 0 
+            grid-template-columns: 100%
+          cards: !include 
+            - ../views/homepage_mobile.yaml
+            - title: {{ title }}
+
+  # Mobile view, visible on small screens and as a sidebar on larger screens 
+  - type: custom:layout-card
+    layout_type: custom:grid-layout
+    layout:
+      margin: 0
+    view_layout:
+      grid-area: mobile
+      show:
+        mediaquery: "(max-width: 799px)"
+    cards:
+      {% if view != 'homepage' %}
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout:
+          margin: 0
+          grid-template-rows: 8px auto
+          grid-template-columns: 40px auto
+          grid-template-areas: |
+            "home gap"
+            "home name"
+        cards:
+          - type: custom:button-card
+            template: icon
+            icon: mdi:home
+            view_layout:
+              grid-area: home
+            tap_action:
+              action: navigate
+              navigation_path: home 
+          - type: custom:button-card
+            template: header_h2
+            view_layout:
+              grid-area: name
+            name: {{ title }} 
+            styles:
+              name:
+                - margin-left: 5px
+      - type: custom:gap-card
+        height: 5 
+      {% endif %}
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout: 
+          margin: 0 
+          grid-template-columns: 100%
+      {% if view == 'homepage' %}
+        cards: !include ../views/homepage_mobile.yaml
+      {% else %}
+        cards: !include 
+          - ../views/{{ view }}.yaml
+          - title: {{ title }}
+      {% endif %}
+
+  # Main window, only visibe on larger screens
+  - type: custom:layout-card
+    layout_type: custom:grid-layout
+    layout:
+      margin: 2px 4px 4px -4px
+    view_layout:
+      grid-area: desktop
+      show:
+        mediaquery: "(min-width: 800px)"
+    cards:
+      - type: custom:button-card
+        template: header_h1
+        name: {{ title }}
+      - type: custom:gap-card
+        height: 10
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout: 
+          margin: -1px 
+          grid-template-columns: 100%
+          grid-column-gap: 8px
+          grid-row-gap: 8px
+          mediaquery:
+            "(min-width: 800px)":
+              grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))
+      {% if view == 'homepage' %}
+        cards: !include ../views/homepage_desktop.yaml
+      {% else %}
+        cards: !include 
+          - ../views/{{ view }}.yaml
+          - title: {{ title }}
+      {% endif %}

@@ -6,31 +6,56 @@ room:
     _enabled_entity_icons: >
       [[[
         return function(variables) {
-
-          // If no entities have been set, return an empty array
-          if (!Array.isArray(variables.entities)) {
+          
+          if(!variables.entities) {
             return [];
           }
 
-          // Otherwise, loop over each entity, identify if it is turned on
-          // or not, and if it is turned on, store the items associated icon
-          var active_entities = [];
-          for (const item of variables.entities) {
-            for (const entity of item.entities) {
+          var icons = [];
+          for (const [key, entities] of Object.entries(variables.entities)) {
 
-              var attribute = states[entity].state;
-              if (item.attribute) {
-                attribute = states[entity].attributes[item.attribute];
+            // Lights
+            if (key == 'lights' && entities) {
+              for (const entity in entities) {
+                if (states[entities[entity]].state == 'on') {
+                  icons.push('mdi:lightbulb');
+                  break;
+                }
               }
 
-              if (['on', 'playing', 'heating'].includes(attribute)) {
-                active_entities.push(item.icon);
-                break;
+            // Media
+            } else if (key == 'media') {
+              for (const entity in entities) {
+                if (['on', 'playing'].includes(states[entities[entity]].state)) {
+                  icons.push('mdi:radio');
+                  break;
+                }
+              }
+
+            // Climate
+            } else if (key == 'climate') {
+              for (const entity in entities) {
+                if (states[entities[entity]].attributes['hvac_action'] == 'heating') {
+                  icons.push('mdi:fire');
+                  break;
+                }
+              }
+
+            // Other
+            } else {
+              for (const item in entities) {
+                for (const entity in entities[item].entities) {
+                  if (states[entities[item].entities[entity]].state == 'on') {
+                    icons.push(entities[item].icon);
+                    break;
+                  }
+                }
               }
             }
-          }
 
-          return active_entities;
+          }
+          
+          return icons;
 
         }
       ]]]
@@ -75,7 +100,7 @@ room:
             if(variables.highlight) {
               return 'var(--secondary-color)';
             } else {
-              return 'var(--label-badge-red)';
+              return 'var(--primary-color)';
             }
             ]]]
       temperature:
