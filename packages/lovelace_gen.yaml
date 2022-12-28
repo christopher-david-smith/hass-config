@@ -67,6 +67,8 @@ lovelace_gen:
 
     - name: "Office"
       icon: "mdi:office-building"
+      media:
+        - media_player.office_speaker
       thermostat:
         - climate.office
       temperature:
