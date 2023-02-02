@@ -1,5 +1,5 @@
 - id: '1670520820732'
-  alias: Washing Machine
+  alias: Device finished - Washing Machine
   description: Toggle a boolean when the washing machine starts and stops, and send
     a notification when the washing machine has finished
   use_blueprint:
@@ -20,7 +20,7 @@
         target:
           entity_id: input_boolean.washing_machine_running
 - id: '1670520910542'
-  alias: Dishwasher
+  alias: Device finished - Dishwasher
   description: Toggle a boolean when the dishwasher starts and stops
   use_blueprint:
     path: sbyx/notify-or-do-something-when-an-appliance-like-a-dishwasher-or-washing-machine-finishes.yaml
@@ -37,3 +37,312 @@
         target:
           entity_id:
           - input_boolean.dishwasher_running
+- id: '1673387891796'
+  alias: Notification - Bin reminder
+  description: ''
+  trigger:
+  - platform: calendar
+    event: start
+    offset: '-5:0:0'
+    entity_id: calendar.garbage_collection
+  condition: []
+  action:
+  - service: notify.mobile_app_chris
+    data:
+      message: Remember to put the {{ trigger.calendar_event.summary.lower() }} bins
+        out!
+  mode: single
+- id: '1674418566849'
+  alias: Heating - Office
+  description: ''
+  use_blueprint:
+    path: christopher-david-smith/heating.yaml
+    input:
+      timer: timer.office_heating_timer
+      override_time: 01:00:00
+      override: input_boolean.office_heating_override
+      schedule: schedule.office_heating_schedule
+      climate: climate.office
+- id: '1674503109792'
+  alias: Heating - Ben's room
+  description: ''
+  use_blueprint:
+    path: christopher-david-smith/heating.yaml
+    input:
+      climate: climate.bens_room
+      schedule: schedule.bens_room_heating_schedule
+      timer: timer.ben_s_room_heating_timer
+      override: input_boolean.ben_s_room_heating_override
+- id: '1674503294300'
+  alias: Heating - Guest room
+  description: ''
+  use_blueprint:
+    path: christopher-david-smith/heating.yaml
+    input:
+      climate: climate.guest_room
+      schedule: schedule.guest_room_heating_schedule
+      timer: timer.guest_room_heating_timer
+      override: input_boolean.guest_room_heating_override
+- id: '1674503899836'
+  alias: Heating - Bedroom
+  description: ''
+  use_blueprint:
+    path: christopher-david-smith/heating.yaml
+    input:
+      climate: climate.bedroom
+      schedule: schedule.bedroom_heating_schedule
+      timer: timer.bedroom_heating_timer
+      override: input_boolean.bedroom_heating_override
+- id: '1674503951996'
+  alias: Heating - Living Room
+  description: ''
+  use_blueprint:
+    path: christopher-david-smith/heating.yaml
+    input:
+      climate: climate.living_room
+      schedule: schedule.living_room_heating_schedule
+      timer: timer.living_room_heating_timer
+      override: input_boolean.living_room_heating_override
+- id: '1674655510461'
+  alias: Home Occupency
+  description: 'When all people have left home, and guest mode is disabled, enable
+    away mode.
+
+    When somebody arrives home, or guest mode is enabled, disable away mode.'
+  use_blueprint:
+    path: christopher-david-smith/away-mode.yaml
+    input:
+      people:
+      - person.bex
+      - person.chris
+      guests: input_boolean.guests
+      home_occupied: input_boolean.home
+- id: '1674659273730'
+  alias: Guests detected on WiFi
+  description: Enable guest mode when devices are detected on the guest network, and
+    disable guest mode when there are no more devices on the guest network.
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.guest_devices
+    above: 0
+    id: enable_guest_mode
+  - platform: numeric_state
+    entity_id: sensor.guest_devices
+    below: 1
+    id: disable_guest_mode
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: enable_guest_mode
+      sequence:
+      - service: input_boolean.turn_on
+        data: {}
+        target:
+          entity_id: input_boolean.guests_automatic
+    - conditions:
+      - condition: trigger
+        id: disable_guest_mode
+      sequence:
+      - service: input_boolean.turn_off
+        data: {}
+        target:
+          entity_id: input_boolean.guests_automatic
+  mode: single
+- id: '1674685886071'
+  alias: Notification - Fridge Door
+  description: ''
+  use_blueprint:
+    path: christopher-david-smith/notify_on_binary_sensor.yaml
+    input:
+      sensor: binary_sensor.fridge_door_contact
+      state: 'on'
+      duration: 00:01:00
+      notification_devices:
+      - 8a68ab0c5fb3b76d73f295f2e35e6f4c
+      notification_message: The fridge door has been left open!
+      clear_notification_on_state_change: true
+- id: '1675254975301'
+  alias: Notification - Freezer door
+  description: ''
+  use_blueprint:
+    path: christopher-david-smith/notify_on_binary_sensor.yaml
+    input:
+      sensor: binary_sensor.freezer_door_contact
+      state: 'on'
+      notification_devices:
+      - 8a68ab0c5fb3b76d73f295f2e35e6f4c
+      notification_message: The Freezer door has been left open!
+      clear_notification_on_state_change: true
+- id: '1675255387633'
+  alias: Turn off - Coffee Machine
+  description: Turn off the coffee machine after it has been on for 30 minutes
+  trigger:
+  - platform: device
+    type: turned_on
+    device_id: 0764c2f7dec3557d1600fe721f72466d
+    entity_id: switch.kitchen_coffee_machine
+    domain: switch
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+  condition: []
+  action:
+  - type: turn_off
+    device_id: 0764c2f7dec3557d1600fe721f72466d
+    entity_id: switch.kitchen_coffee_machine
+    domain: switch
+  mode: single
+- id: '1675261312691'
+  alias: Lights - Porch
+  description: Turn on the porch light when either the front door or porch door is
+    opened. Then, once both doors are closed, wait for 1 minute before turning off
+    the light. If at any point during the 1 minute wait either door should be opened
+    again, that timer should be stopped and the light should remain on until both
+    doors are closed, at which point the 1 minute countdown starts again.
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.front_door
+    - binary_sensor.porch_door_contact
+    to: 'on'
+    id: open
+  - platform: state
+    entity_id:
+    - binary_sensor.front_door
+    - binary_sensor.porch_door_contact
+    to: 'off'
+    id: closed
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: open
+      sequence:
+      - service: light.turn_on
+        data: {}
+        target:
+          entity_id: light.porch_light
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: trigger
+          id: closed
+        - condition: and
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.porch_door_contact
+            state: 'off'
+          - condition: state
+            entity_id: binary_sensor.front_door
+            state: 'off'
+      sequence:
+      - delay:
+          hours: 0
+          minutes: 1
+          seconds: 0
+          milliseconds: 0
+      - service: light.turn_off
+        data: {}
+        target:
+          entity_id: light.porch_light
+  mode: restart
+- id: '1675280343091'
+  alias: Guest Mode
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - input_boolean.guests_manual
+    - input_boolean.guests_automatic
+    to: 'on'
+    id: guests_enabled
+  - platform: state
+    entity_id:
+    - input_boolean.guests_manual
+    - input_boolean.guests_automatic
+    to: 'off'
+    id: guests_disabled
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: guests_enabled
+      sequence:
+      - service: input_boolean.turn_on
+        data: {}
+        target:
+          entity_id: input_boolean.guests
+    - conditions:
+      - condition: trigger
+        id: guests_disabled
+      - condition: and
+        conditions:
+        - condition: state
+          entity_id: input_boolean.guests_manual
+          state: 'off'
+        - condition: state
+          entity_id: input_boolean.guests_automatic
+          state: 'off'
+      sequence:
+      - service: input_boolean.turn_off
+        data: {}
+        target:
+          entity_id: input_boolean.guests
+  mode: single
+- id: '1675281566324'
+  alias: Notification - Bex left work
+  description: ''
+  trigger:
+  - platform: zone
+    entity_id: person.bex
+    zone: zone.bex_work
+    event: leave
+  condition:
+  - condition: time
+    weekday:
+    - wed
+    - tue
+    after: '15:45:00'
+    before: '19:00:00'
+  action:
+  - service: notify.mobile_app_chris
+    data:
+      message: Bex has left work
+  mode: single
+- id: '1675282319188'
+  alias: Restart - Texecom2MQTT
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.texecom2mqtt_running
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 2
+      seconds: 0
+  condition: []
+  action:
+  - service: hassio.addon_start
+    data:
+      addon: c15a2434_texecom2mqtt
+  mode: single
+- id: '1675282861505'
+  alias: Lights - Landing light
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - light.landing_light
+  condition: []
+  action:
+  - service: light.toggle
+    data: {}
+    target:
+      entity_id: light.upstairs_landing_light
+  mode: single
