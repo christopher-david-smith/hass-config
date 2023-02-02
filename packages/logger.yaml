@@ -4,3 +4,5 @@ logger:
   filters:
     homeassistant.loader:
       - "We found a custom integration"
+    homeassistant.components.sensor:
+      - "command_line is taking over 10 seconds"
