@@ -17,7 +17,7 @@ lovelace_gen:
     - name: "Living Room"
       icon: "mdi:sofa"
       lights:
-        - light.living_room_main_light
+        - light.living_room_light
         - light.living_room_corner_light
       media:
         - media_player.living_room_tv
@@ -67,6 +67,8 @@ lovelace_gen:
 
     - name: "Office"
       icon: "mdi:office-building"
+      lights:
+        - light.office_light
       media:
         - media_player.office_speaker
       thermostat:
