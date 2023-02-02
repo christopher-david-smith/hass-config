@@ -1,0 +1,260 @@
+blueprint:
+  name: Heating controls 
+  description: Control a Tado thermostatic radiator valve 
+  domain: automation
+  input:
+
+    climate:
+      name: Climate device
+      description: The Tado TRV device to control 
+      selector:
+        entity:
+          domain: climate
+    
+    schedule:
+      name: Heating schedule
+      description: The heating schedule used to control this device
+      selector:
+        entity:
+          domain: schedule
+
+    timer:
+      name: Heating override timer
+      description: A (unique to this climate device) timer used when the heating schedule is overridden
+      selector:
+        entity:
+          domain: timer
+
+    override_time:
+      name: Heating override duration
+      description: How long should heating be overriden for before the schedule is resumed?
+      selector:
+        time:
+      default: "01:00:00"
+
+    override:
+      name: Heating override toggle 
+      description: Input boolean used to indicate if the heating is currently being overridden
+      selector:
+        entity:
+          domain: input_boolean
+
+    temperature_max:
+      name: Heating temperature 
+      description: The temperature to set the climate device to when the schedule is set to on
+      selector:
+        number:
+          min: 3
+          max: 20
+          mode: slider
+          unit_of_measurement: "degrees celcius"
+      default: 16
+
+    temperature_min:
+      name: Idle temperature
+      description: The temperature to set the climate device to when the schedule is set to off
+      selector:
+        number:
+          min: 3
+          max: 20
+          mode: slider
+          unit_of_measurement: "degrees celcius"
+      default: 5
+  
+variables:
+  climate: !input climate
+  schedule: !input schedule
+  temperature_min: !input temperature_min
+  temperature_max: !input temperature_max
+
+trigger:
+  
+  # Arrived home
+  - platform: state
+    entity_id: "input_boolean.home" 
+    to: "on"
+    id: arrived_home
+
+  # Left Home
+  - platform: state
+    entity_id: "input_boolean.home" 
+    to: "off"
+    id: left_home
+
+  # On way home
+  - platform: state
+    entity_id: "input_boolean.on_way_home"
+    to: "on"
+    id: on_way_home
+
+  # Schedule changed to on
+  - platform: state
+    entity_id: !input schedule
+    to: "on"
+    id: schedule_on
+
+  # Schedule changed to off
+  - platform: state
+    entity_id: !input schedule
+    to: "off"
+    id: schedule_off
+
+  # Heating override
+  - platform: state
+    entity_id: !input climate
+    attribute: temperature
+    id: heating_override
+
+  # Heating override finished
+  - platform: state
+    entity_id: !input timer
+    to: "idle"
+    id: heating_override_end
+
+action:
+
+  - choose:
+
+    # Resume heating schedule when occupents ieither arrive home,
+    # or when they are on their way home
+    - conditions:
+      - condition: or
+        conditions:
+          - condition: trigger
+            id: arrived_home
+          - condition: trigger
+            id: on_way_home
+      sequence: 
+        - choose:
+          - conditions:
+            - condition: state
+              entity_id: !input schedule
+              state: "on"
+            sequence:
+              - service: climate.set_temperature
+                data:
+                  temperature: !input temperature_max
+                target:
+                  entity_id: !input climate
+
+          - conditions:
+            - condition: state
+              entity_id: !input schedule
+              state: "off"
+            sequence:
+              - service: climate.set_temperature
+                data:
+                  temperature: !input temperature_min 
+                target:
+                  entity_id: !input climate
+
+    # Turn off heating when all occupents have left home
+    - conditions:
+      - condition: trigger
+        id: left_home
+      sequence:
+        - service: climate.set_temperature
+          data:
+            temperature: !input temperature_min
+          target:
+            entity_id: !input climate
+  
+    # Turn on heating when schedule changes to 'on' 
+    - conditions:
+      - condition: trigger
+        id: schedule_on
+      sequence: 
+        - condition: state
+          entity_id: !input override 
+          state: "off"
+        - service: climate.set_temperature
+          data:
+            temperature: !input temperature_max
+          target:
+            entity_id: !input climate
+
+    # Turn off heating when schedule changes to 'off'
+    - conditions:
+      - condition: trigger
+        id: schedule_off
+      sequence: 
+        - condition: state
+          entity_id: !input override 
+          state: "off"
+        - service: climate.set_temperature
+          data:
+            temperature: !input temperature_min
+          target:
+            entity_id: !input climate
+
+    # Resume schedule when override timer finishes
+    - conditions:
+      - condition: trigger
+        id: heating_override_end
+      sequence:
+        - choose:
+          - conditions:
+            - condition: state
+              entity_id: !input schedule
+              state: "on"
+            sequence:
+              - service: climate.set_temperature
+                data:
+                  temperature: !input temperature_max
+                target:
+                  entity_id: !input climate
+
+          - conditions:
+            - condition: state
+              entity_id: !input schedule
+              state: "off"
+            sequence:
+              - service: climate.set_temperature
+                data:
+                  temperature: !input temperature_min 
+                target:
+                  entity_id: !input climate
+        - service: input_boolean.turn_off
+          data: {}
+          target:
+            entity_id: !input override 
+
+    # Override or reset heating
+    - conditions:
+        - condition: trigger
+          id: heating_override
+      sequence:
+        - choose:
+
+          # Override heating
+          - conditions:
+            - condition: template
+              value_template: >
+                {{ ((states[climate].attributes.temperature != temperature_max and is_state(schedule, 'on')) or
+                   (states[climate].attributes.temperature != temperature_min and is_state(schedule, 'off'))) }}
+            sequence: 
+              - service: input_boolean.turn_on 
+                data: {}
+                target:
+                  entity_id: !input override 
+              - service: timer.start
+                data:
+                  duration: !input override_time
+                target:
+                  entity_id: !input timer
+
+          # Reset heating
+          - conditions:
+            - condition: template
+              value_template: >
+                {{ ((states[climate].attributes.temperature == temperature_max and is_state(schedule, 'on')) or
+                   (states[climate].attributes.temperature == temperature_min and is_state(schedule, 'off'))) }}
+            sequence:
+              - service: input_boolean.turn_off
+                data: {}
+                target:
+                  entity_id: !input override 
+              - service: timer.finish
+                data: {}
+                target:
+                  entity_id: !input timer

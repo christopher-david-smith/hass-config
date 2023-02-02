@@ -1,0 +1,100 @@
+blueprint:
+  name: Binary sensor notification
+  domain: automation
+  input:
+    
+    sensor:
+      name: Sensor
+      description: Binary sensor to monitor
+      selector:
+        entity:
+          domain: binary_sensor
+
+    state:
+      name: State
+      description: Fire automation if sensor changes to this state
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - "on" 
+            - "off"
+
+    duration:
+      name: Length of time
+      description: Sensor must be in the required state for this amount of time
+      default: "00:01:00"
+      selector:
+        time:
+
+    notification_devices:
+      name: Devices
+      description: Devices to send notifications to
+      selector:
+        device:
+          integration: mobile_app
+          multiple: true
+
+    notification_message:
+      name: Message
+      description: Message to send to devices
+      selector:
+        text:
+          type: text
+          multiline: true
+
+    clear_notification_on_state_change:
+      name: Automatically clear notification
+      description: Automatically clear the notification if the binary sensor changes state
+      selector:
+        boolean:
+
+variables:
+  notification_devices: !input notification_devices
+  state: !input state
+  duration: !input duration 
+  clear_notification_on_state_change: !input clear_notification_on_state_change
+
+trigger:
+  - platform: state
+    entity_id: !input sensor
+    to: !input state
+    for: !input duration 
+    id: notify
+
+  - platform: state
+    entity_id: !input sensor
+    from: !input state
+    id: clear_notification 
+
+action:
+  choose:
+    - conditions:
+      - condition: trigger
+        id: notify
+      sequence: 
+        - repeat:
+            count: "{{ notification_devices | count }}"
+            sequence:
+              - service: "notify.mobile_app_{{ device_attr(notification_devices[repeat.index - 1], 'name') }}"
+                data:
+                  message: !input notification_message 
+                  data:
+                    tag: "{{ trigger.entity_id }}_{{ state }}_{{ duration }}"
+
+    - conditions:
+      - condition: and
+        conditions:
+          - condition: trigger
+            id: clear_notification
+          - condition: template
+            value_template: "{{ clear_notification_on_state_change }}"
+      sequence: 
+        - repeat:
+            count: "{{ notification_devices | count }}"
+            sequence:
+              - service: "notify.mobile_app_{{ device_attr(notification_devices[repeat.index - 1], 'name') }}"
+                data:
+                  message: "clear_notification"
+                  data:
+                    tag: "{{ trigger.entity_id }}_{{ state }}_{{ duration }}"

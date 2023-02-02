@@ -1,0 +1,91 @@
+blueprint:
+
+  name: Home occupency
+  description: Set home occupency as people leave and arrive at home
+  domain: automation
+  input:
+
+    people:
+      name: People
+      description: People who should be monitored 
+      selector:
+        entity:
+          domain: person
+          multiple: true
+
+    guests:
+      name: Guest Mode
+      description: Input boolean that controls Guest Mode 
+      selector:
+        entity:
+          domain: input_boolean
+
+    home_occupied:
+      name: Home occupied
+      description: Input boolean that controls home occupency
+      selector:
+        entity:
+          domain: input_boolean
+
+trigger:
+
+  - platform: state
+    entity_id: !input people
+    to: "home"
+    id: home_occupied
+
+  - platform: state
+    entity_id: !input guests
+    to: "on"
+    id: home_occupied
+
+  - platform: state
+    entity_id: !input people
+    from: "home"
+    id: home_unoccupied
+
+  - platform: state
+    entity_id: !input guests
+    to: "off"
+    id: home_unoccupied
+
+action:
+
+  choose:
+    - conditions:
+      - condition: and
+        conditions:
+          - condition: trigger
+            id: home_occupied
+          - condition: state
+            entity_id: !input home_occupied
+            state: "off"
+      sequence:
+        - service: input_boolean.turn_on
+          data: {}
+          target:
+            entity_id: !input home_occupied
+
+    - conditions:
+      - condition: and
+        conditions:
+          - condition: trigger
+            id: home_unoccupied
+          - condition: not
+            conditions:
+            - condition: state
+              entity_id: !input people
+              state: home
+              match: any
+          - condition: state
+            entity_id: !input guests
+            state: "off"
+          - condition: state
+            entity_id: !input home_occupied
+            state: "on"
+      sequence:
+        - service: input_boolean.turn_off
+          data: {}
+          target:
+            entity_id: !input home_occupied
+
