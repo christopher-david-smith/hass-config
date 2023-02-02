@@ -6,7 +6,7 @@ room:
     _enabled_entity_icons: >
       [[[
         return function(variables) {
-          
+
           if(!variables.entities) {
             return [];
           }
@@ -17,27 +17,33 @@ room:
             // Lights
             if (key == 'lights' && entities) {
               for (const entity in entities) {
-                if (states[entities[entity]].state == 'on') {
-                  icons.push('mdi:lightbulb');
-                  break;
+                if (states[entities[entity]]) {
+                  if (states[entities[entity]].state == 'on') {
+                    icons.push('mdi:lightbulb');
+                    break;
+                  }
                 }
               }
 
             // Media
             } else if (key == 'media') {
               for (const entity in entities) {
-                if (['on', 'playing'].includes(states[entities[entity]].state)) {
-                  icons.push('mdi:radio');
-                  break;
+                if (states[entities[entity]]) {
+                  if (['on', 'playing'].includes(states[entities[entity]].state)) {
+                    icons.push('mdi:radio');
+                    break;
+                  }
                 }
               }
 
             // Climate
             } else if (key == 'climate') {
               for (const entity in entities) {
-                if (states[entities[entity]].attributes['hvac_action'] == 'heating') {
-                  icons.push('mdi:fire');
-                  break;
+                if (states[entities[entity]]) {
+                  if (states[entities[entity]].attributes['hvac_action'] == 'heating') {
+                    icons.push('mdi:fire');
+                    break;
+                  }
                 }
               }
 
@@ -45,16 +51,18 @@ room:
             } else {
               for (const item in entities) {
                 for (const entity in entities[item].entities) {
-                  if (states[entities[item].entities[entity]].state == 'on') {
-                    icons.push(entities[item].icon);
-                    break;
+                  if (states[entities[item].entities[entity]]) {
+                    if (states[entities[item].entities[entity]].state == 'on') {
+                      icons.push(entities[item].icon);
+                      break;
+                    }
                   }
                 }
               }
             }
 
           }
-          
+
           return icons;
 
         }
@@ -81,7 +89,7 @@ room:
     name:
       - font-size: var(--body-font-size)
       - padding: 4px 4px 12px 12px
-      - white-space: nowrap 
+      - white-space: nowrap
       - text-align: left
       - justify-self: start
       - align-self: end
@@ -98,9 +106,9 @@ room:
         - color: >
             [[[
             if(variables.highlight) {
-              return 'var(--secondary-color)';
+              return 'white';
             } else {
-              return 'var(--primary-color)';
+              return 'var(--accent-color)';
             }
             ]]]
       temperature:

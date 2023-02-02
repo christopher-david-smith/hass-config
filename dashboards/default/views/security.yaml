@@ -1,21 +1,16 @@
 # lovelace_gen
 
+{% extends "dashboards/default/templates/page.yaml" %}
+
+{% block cards %}
 - type: vertical-stack
   cards:
-    - type: custom:button-card
-      template: header_h2
-      name: Alarm
     - type: custom:mushroom-alarm-control-panel-card
       entity: alarm_control_panel.home
       states:
         - armed_away
         - disarmed
 
-- type: vertical-stack
-  cards:
-    - type: custom:button-card
-      template: header_h2
-      name: CCTV
     - type: custom:layout-card
       layout_type: custom:masonry-layout
       layout:
@@ -33,3 +28,4 @@
               background: true
               ui: true
             {% endfor %}
+{% endblock %}

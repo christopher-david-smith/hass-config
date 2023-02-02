@@ -1,5 +1,7 @@
 # lovelace_gen
 
+{% extends "dashboards/default/templates/page.yaml" %}
+
 {% set ns = namespace(room=None) %}
 {% for room in _global.rooms %}
   {% if room.name == title %}
@@ -7,94 +9,52 @@
   {% endif %}
 {% endfor %}
 
+{% block cards %}
 {% if ns.room.lights %}
 - type: vertical-stack
-  cards:
-    - type: custom:button-card
-      template: header_h2
-      name: Lights
-    {% for light in ns.room.lights %}
-    - type: custom:mushroom-light-card
-      entity: {{ light }}
-      icon: mdi:lightbulb
-      show_brightness_control: true
-      show_color_temp_control: true
-      show_color_control: true
-      collapsible_controls: true
-      use_light_color: true
-    - type: custom:gap-card
-      height: 9
-    {% endfor %}
+  cards: !include
+    - ../templates/entities.yaml
+    - name: Lights
+      card: custom:mushroom-light-card
+      items: {{ ns.room.lights }}
+      options:
+        full_width: true
+      card_options:
+        show_brightness_control: true
+        show_color_temp_control: true
+        show_color_control: true
+        collapsible_control: true
+        use_light_color: true
 {% endif %}
 
 {% if ns.room.media %}
 - type: vertical-stack
-  cards:
-    - type: custom:button-card
-      template: header_h2
-      name: Media 
-    - type: custom:layout-card
-      layout_type: custom:grid-layout
-      layout: !include ../templates/columns.yaml
-      cards:
-        {% for media in ns.room.media %}
-        - type: custom:mushroom-media-player-card
-          entity: {{ media }}
-          view_layout: !include 
-            - ../templates/column_expand.yaml
-            - index: {{ loop.index0 }}
-              next_entity: {{ ns.room.media[loop.index0 + 1] }}
-        {% endfor %}
+  cards: !include
+    - ../templates/entities.yaml
+    - name: Media
+      card: custom:mushroom-media-player-card
+      items: {{ ns.room.media }}
 {% endif %}
 
 {% if ns.room.thermostat %}
 - type: vertical-stack
-  cards:
-    - type: custom:button-card
-      template: header_h2
-      name: Climate 
-    - type: custom:layout-card
-      layout_type: custom:grid-layout
-      layout: !include ../templates/columns.yaml
-      cards:
-        {% for thermostat in ns.room.thermostat %}
-        - type: custom:mushroom-climate-card
-          entity: {{ thermostat }}
-          show_temperature_control: true
-          tap_action: more-info
-          view_layout:
-            grid-column: 1/-1
-        {% endfor %}
+  cards: !include
+    - ../templates/entities.yaml
+    - name: Climate
+      card: custom:mushroom-climate-card
+      items: {{ ns.room.thermostat }}
+      options:
+        full_width: true
+      card_options:
+        show_temperature_control: true
+        tap_action: more-info
 {% endif %}
 
 {% if ns.room.other %}
 - type: vertical-stack
-  cards:
-    - type: custom:button-card
-      template: header_h2
-      name: Other 
-    - type: custom:layout-card
-      layout_type: custom:grid-layout
-      layout: !include ../templates/columns.yaml
-      cards:
-        {% for item in ns.room.other %}
-          {% for entity in item.entities %}
-        - type: custom:mushroom-entity-card
-          entity: {{ entity }}
-          icon: {{ item.icon }}
-          {% if item.name %}
-          name: {{ item.name }}
-          {% endif %}
-          tap_action:
-            {% if item.report_state_only %}
-            action: none
-            {% else %}
-            action: toggle
-            {% endif %}
-          {% endfor %}
-          view_layout: !include 
-            - ../templates/column_expand.yaml
-            - index: {{ loop.index0 }}
-              next_entity: {{ ns.room.other[loop.index0 + 1] }}
-        {% endfor %}
+  cards: !include
+    - ../templates/entities.yaml
+    - name: Other
+      items: {{ ns.room.other | tojson }}
 {% endif %}
+{% endblock %}

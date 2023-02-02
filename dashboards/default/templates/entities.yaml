@@ -1,0 +1,51 @@
+# lovelace_gen
+
+{% if name %}
+- type: custom:button-card
+  template: header_h2
+  name: {{ name }}
+{% endif %}
+- type: custom:layout-card
+  layout_type: custom:grid-layout
+  layout:
+    margin: -4px
+    grid-template-columns: repeat(auto-fill, minmax(40%, 1fr))
+  cards:
+{% for item in items %}
+  {% if item is mapping %}
+    {% for entity in item.entities %}
+    - type: custom:mushroom-entity-card
+      entity: {{ entity }}
+      icon: {{ item.icon }}
+      {% if item.name %}
+      name: {{ item.name }}
+      {% endif %}
+      tap_action:
+      {% if item.report_state_only %}
+        action: none
+      {% else %}
+        action: toggle
+      {% endif %}
+      {% if loop.index0 % 2 == 0 or (options and options.full_width) %}
+        {% if not items[loop.index0 + 1] or (options and options.full_width) %}
+      view_layout:
+        grid-column: 1/-1
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    - type: {{ card }}
+      entity: {{ item }}
+    {% if loop.index0 % 2 == 0 or (options and options.full_width) %}
+      {% if not items[loop.index0 + 1] or (options and options.full_width) %}
+      view_layout:
+        grid-column: 1/-1
+      {% endif %}
+    {% endif %}
+    {% if card_options %}
+      {% for key, value in card_options.items() %}
+      {{ key }}: {{ value }}
+      {% endfor %}
+    {% endif %}
+  {% endif %}
+{% endfor %}

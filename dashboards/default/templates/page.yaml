@@ -1,0 +1,37 @@
+# lovelace_gen
+
+{% set title %}{% block title %}{{ title }}{% endblock %}{% endset %}
+
+{% block header %}
+- type: custom:button-card
+  template: header_h1
+  name: {{ title }}
+  view_layout:
+    grid-column: 1/-1
+    show:
+      mediaquery: "(min-width: 800px)"
+  styles:
+    card:
+      - margin-top: 5px
+
+- type: custom:layout-card
+  layout_type: custom:grid-layout
+  view_layout:
+    show:
+      mediaquery: "(max-width: 800px)"
+  layout:
+    grid-template-columns: min-content auto
+    margin: -4px
+  cards:
+    - type: custom:mushroom-chips-card
+      chips:
+        - type: back
+    - type: custom:button-card
+      template: header_h2
+      name: {{ title }}
+      styles:
+        card:
+          - margin-top: 5px
+{% endblock %}
+
+{% block cards %}{% endblock %}
