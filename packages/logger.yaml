@@ -1,5 +1,5 @@
 logger:
-  default: warning
+  default: info 
 
   filters:
     homassistant.loader:
