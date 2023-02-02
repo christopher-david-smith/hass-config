@@ -1,12 +1,6 @@
 - id: '1670434175284'
   name: Evening lighting
   entities:
-    light.living_room_main_light:
-      supported_color_modes:
-      - onoff
-      friendly_name: Main Light
-      supported_features: 0
-      state: 'off'
     light.living_room_corner_light:
       min_color_temp_kelvin: 1801
       max_color_temp_kelvin: 6535
@@ -22,26 +16,32 @@
       supported_color_modes:
       - color_temp
       - xy
-      friendly_name: Corner Light
-      supported_features: 44
       color_mode: color_temp
-      brightness: 152
+      brightness: 255
+      color_temp_kelvin: 2544
+      color_temp: 393
       hs_color:
-      - 28.679
-      - 69.803
+      - 28.761
+      - 70.952
       rgb_color:
       - 255
-      - 162
-      - 77
+      - 160
+      - 74
       xy_color:
-      - 0.538
-      - 0.389
-      color_temp_kelvin: 2577
-      color_temp: 388
+      - 0.543
+      - 0.388
+      friendly_name: Corner Light
+      supported_features: 44
       state: 'on'
+    light.living_room_lights_right:
+      supported_color_modes:
+      - onoff
+      friendly_name: Living Room Lights right
+      supported_features: 0
+      state: 'off'
   icon: mdi:lightbulb-multiple
   metadata:
-    light.living_room_main_light:
-      entity_only: true
     light.living_room_corner_light:
+      entity_only: true
+    light.living_room_lights_right:
       entity_only: true
