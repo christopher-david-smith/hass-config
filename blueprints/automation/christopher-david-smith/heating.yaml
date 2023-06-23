@@ -164,9 +164,14 @@ action:
       - condition: trigger
         id: schedule_on
       sequence: 
-        - condition: state
-          entity_id: !input override 
-          state: "off"
+        - condition: and
+          conditions:
+            - condition: state
+              entity_id: !input override 
+              state: "off"
+            - condition: state
+              entity_id: "input_boolean.home" 
+              state: "on"
         - service: climate.set_temperature
           data:
             temperature: !input temperature_max
