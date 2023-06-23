@@ -58,6 +58,7 @@
       schedule: schedule.bens_room_heating_schedule
       timer: timer.ben_s_room_heating_timer
       override: input_boolean.ben_s_room_heating_override
+      temperature_max: 17
 - id: '1674503294300'
   alias: Heating - Guest room
   description: ''
@@ -88,6 +89,7 @@
       schedule: schedule.living_room_heating_schedule
       timer: timer.living_room_heating_timer
       override: input_boolean.living_room_heating_override
+      override_time: 02:00:00
 - id: '1674655510461'
   alias: Home Occupency
   description: 'When all people have left home, and guest mode is disabled, enable
@@ -308,15 +310,12 @@
   alias: Restart - Texecom2MQTT
   description: ''
   trigger:
-  - platform: state
-    entity_id:
-    - binary_sensor.texecom2mqtt_running
-    to: 'off'
-    for:
-      hours: 0
-      minutes: 2
-      seconds: 0
-  condition: []
+  - platform: time_pattern
+    minutes: '*'
+  condition:
+  - condition: state
+    entity_id: binary_sensor.texecom2mqtt_running
+    state: 'off'
   action:
   - service: hassio.addon_start
     data:
@@ -328,11 +327,116 @@
   trigger:
   - platform: state
     entity_id:
-    - light.landing_light
+    - switch.living_room_light_switch_left
   condition: []
   action:
-  - service: light.toggle
+  - service: switch.toggle
     data: {}
     target:
-      entity_id: light.upstairs_landing_light
+      entity_id: switch.upstairs_landing_light_switch_right
+  mode: single
+- id: '1680092990854'
+  alias: Alarm - Arm when away
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - input_boolean.home
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 2
+      seconds: 0
+  condition: []
+  action:
+  - service: alarm_control_panel.alarm_arm_away
+    data:
+      code: 0911
+    target:
+      entity_id: alarm_control_panel.home
+  mode: single
+- id: '1680093044654'
+  alias: Alarm - Disarm when home
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - input_boolean.home
+    to: 'on'
+  condition: []
+  action:
+  - service: alarm_control_panel.alarm_disarm
+    data:
+      code: 0911
+    target:
+      entity_id: alarm_control_panel.home
+  mode: single
+- id: '1680560963312'
+  alias: Lights - Living room, turn off
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.occupancy
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+  condition: []
+  action:
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id:
+      - switch.living_room_corner_light
+      - switch.living_room_light_switch_right
+  mode: single
+- id: '1682628763396'
+  alias: Lights - Living room on motion
+  description: ''
+  trigger:
+  - type: occupied
+    platform: device
+    device_id: 7ee3f4963e4e93bbff053f1076e06c20
+    entity_id: binary_sensor.occupancy
+    domain: binary_sensor
+    alias: Movement detected in Living Room
+  condition:
+  - type: is_illuminance
+    condition: device
+    device_id: 7ee3f4963e4e93bbff053f1076e06c20
+    entity_id: sensor.illuminance
+    domain: sensor
+    below: 5
+  action:
+  - if:
+    - condition: time
+      before: 09:00:00
+      after: 07:00:00
+    then:
+    - service: switch.turn_on
+      data: {}
+      target:
+        entity_id: switch.living_room_light_switch_right
+    else:
+    - service: switch.turn_on
+      data: {}
+      target:
+        entity_id: switch.living_room_corner_light
+  mode: single
+- id: '1682717372742'
+  alias: Lights - Living room, toggle corner/main
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.living_room_light_switch_right
+    to: 'on'
+  condition: []
+  action:
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.living_room_corner_light
   mode: single
