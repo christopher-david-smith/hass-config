@@ -37,21 +37,6 @@
         target:
           entity_id:
           - input_boolean.dishwasher_running
-- id: '1673387891796'
-  alias: Notification - Bin reminder
-  description: ''
-  trigger:
-  - platform: calendar
-    event: start
-    offset: '-5:0:0'
-    entity_id: calendar.garbage_collection
-  condition: []
-  action:
-  - service: notify.mobile_app_chris
-    data:
-      message: Remember to put the {{ trigger.calendar_event.summary.lower() }} bins
-        out!
-  mode: single
 - id: '1674418566849'
   alias: Heating - Office
   description: ''
