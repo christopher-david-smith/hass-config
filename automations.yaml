@@ -221,9 +221,14 @@
           - condition: state
             entity_id: binary_sensor.porch_door_contact
             state: 'off'
-          - condition: state
-            entity_id: binary_sensor.front_door
-            state: 'off'
+          - condition: or
+            conditions:
+            - condition: state
+              entity_id: binary_sensor.front_door
+              state: 'off'
+            - condition: state
+              entity_id: binary_sensor.front_door
+              state: unavailable
       sequence:
       - delay:
           hours: 0
