@@ -1,60 +1,81 @@
 # lovelace_gen
 
-{% extends "dashboards/default/templates/page.yaml" %}
+title: {{ room.name }}
+path: {{ room.path }}
 
-{% set ns = namespace(room=None) %}
-{% for room in _global.rooms %}
-  {% if room.name == title %}
-    {% set ns.room = room %}
-  {% endif %}
-{% endfor %}
+cards:
 
-{% block cards %}
-{% if ns.room.lights %}
-- type: vertical-stack
-  cards: !include
-    - ../templates/entities.yaml
-    - name: Lights
-      card: custom:mushroom-light-card
-      items: {{ ns.room.lights }}
-      options:
-        full_width: true
-      card_options:
-        show_brightness_control: true
-        show_color_temp_control: true
-        show_color_control: true
-        collapsible_control: true
-        use_light_color: true
-{% endif %}
+  - type: vertical-stack
+    cards:
 
-{% if ns.room.media %}
-- type: vertical-stack
-  cards: !include
-    - ../templates/entities.yaml
-    - name: Media
-      card: custom:mushroom-media-player-card
-      items: {{ ns.room.media }}
-{% endif %}
+      - !include
+        - ../templates/dashboard/header.yaml
+        - name: {{ room.name }}
 
-{% if ns.room.thermostat %}
-- type: vertical-stack
-  cards: !include
-    - ../templates/entities.yaml
-    - name: Climate
-      card: custom:mushroom-climate-card
-      items: {{ ns.room.thermostat }}
-      options:
-        full_width: true
-      card_options:
-        show_temperature_control: true
-        tap_action: more-info
-{% endif %}
-
-{% if ns.room.other %}
-- type: vertical-stack
-  cards: !include
-    - ../templates/entities.yaml
-    - name: Other
-      items: {{ ns.room.other | tojson }}
-{% endif %}
-{% endblock %}
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout:
+          grid-template-columns: repeat(auto-fit, minmax(34%, 1fr))
+          {% if room.devices %}
+        cards:
+            {% if room.devices.lights %}
+          - type: custom:button-card
+            name: Lights
+            icon: mdi:lightbulb
+            template: devices
+            variables:
+              states: ['on']
+              icon: mdi:lightbulb
+              entities: {{ room.devices.lights }}
+            tap_action:
+              action: navigate
+              navigation_path: {{ room.path }}_lights
+            {% endif %}
+            {% if room.devices.media %}
+          - type: custom:button-card
+            name: Media
+            icon: mdi:radio
+            template: devices
+            variables:
+              states: ['on', 'playing']
+              icon: mdi:radio
+              entities: {{ room.devices.media }}
+            tap_action:
+              action: navigate
+              navigation_path: {{ room.path }}_media
+            {% endif %}
+            {% if room.devices.other %}
+              {% for device in room.devices.other %}
+          - type: custom:button-card
+            entity: {{ device.entity }}
+            template: devices
+            {% if device.report_state_only %}
+            tap_action:
+              action: none
+            {% endif %}
+            {% if device.name %}
+            name: {{ device.name }}
+            {% endif %}
+            icon: {{ device.icon }}
+            variables:
+              icon: {{ device.icon }}
+              states: ['on']
+              entities: 
+                - entity: {{ device.entity }}
+              {% endfor %}
+            {% endif %}
+            {% if room.climate %}
+          - type: custom:button-card
+            name: Climate
+            template: devices 
+            tap_action:
+              action: navigate
+              navigation_path: {{ room.path }}_climate
+            variables:
+              states: ['heating']
+              attribute: 'hvac_action'
+              icon: mdi:fire
+              entities: 
+                - entity: {{ room.climate.thermostat }}
+            {% endif %}
+          {% endif %}

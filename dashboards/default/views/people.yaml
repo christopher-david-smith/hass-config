@@ -1,25 +1,32 @@
 # lovelace_gen
 
-{% extends "dashboards/default/templates/page.yaml" %}
+title: People 
+path: people 
 
-{% block cards %}
-- type: vertical-stack
-  cards:
-    - type: vertical-stack
-      cards: !include
-        - ../templates/entities.yaml
-        - card: custom:mushroom-person-card
-          items:
-            - person.bex
-            - person.chris
-    - type: map
-      entities:
-        {% for person in _global.people %}
-        - {{ person }}
-        {% endfor %}
-      card_mod:
-        style: |
-          ha-map {
-            position: inherit !important;
-          }
-{% endblock %}
+cards:
+
+  - type: vertical-stack
+    cards:
+
+      - !include
+        - ../templates/dashboard/header.yaml
+        - name: People
+
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout:
+          grid-template-columns: 50% 50%
+        cards:
+          {% for person in _global.people %}
+          - type: custom:mushroom-person-card
+            entity: {{ person }}
+          {% endfor %}
+      
+      - type: custom:layout-card
+        layout_type: custom:masonry-layout
+        cards:
+          - type: map
+            entities:
+              {% for person in _global.people %}
+              - {{ person }}
+              {% endfor %}

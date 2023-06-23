@@ -1,24 +1,23 @@
 room:
   triggers_update: all
   variables:
-    highlight: false
     entities: []
     _enabled_entity_icons: >
       [[[
         return function(variables) {
-
+          
           if(!variables.entities) {
             return [];
           }
 
           var icons = [];
           for (const [key, entities] of Object.entries(variables.entities)) {
-
+            
             // Lights
             if (key == 'lights' && entities) {
               for (const entity in entities) {
-                if (states[entities[entity]]) {
-                  if (states[entities[entity]].state == 'on') {
+                if (states[entities[entity]['entity']]) {
+                  if (states[entities[entity]['entity']].state == 'on') {
                     icons.push('mdi:lightbulb');
                     break;
                   }
@@ -28,8 +27,8 @@ room:
             // Media
             } else if (key == 'media') {
               for (const entity in entities) {
-                if (states[entities[entity]]) {
-                  if (['on', 'playing'].includes(states[entities[entity]].state)) {
+                if (states[entities[entity]['entity']]) {
+                  if (['on', 'playing'].includes(states[entities[entity]['entity']].state)) {
                     icons.push('mdi:radio');
                     break;
                   }
@@ -39,8 +38,8 @@ room:
             // Climate
             } else if (key == 'climate') {
               for (const entity in entities) {
-                if (states[entities[entity]]) {
-                  if (states[entities[entity]].attributes['hvac_action'] == 'heating') {
+                if (states[entities[entity]['entity']]) {
+                  if (states[entities[entity]['entity']].attributes['hvac_action'] == 'heating') {
                     icons.push('mdi:fire');
                     break;
                   }
@@ -50,15 +49,11 @@ room:
             // Other
             } else {
               for (const item in entities) {
-                for (const entity in entities[item].entities) {
-                  if (states[entities[item].entities[entity]]) {
-                    if (states[entities[item].entities[entity]].state == 'on') {
-                      icons.push(entities[item].icon);
-                      break;
-                    }
-                  }
+                if (states[entities[item].entity].state == 'on') {
+                  icons.push(entities[item].icon)
                 }
               }
+
             }
 
           }
@@ -80,12 +75,6 @@ room:
       - grid-template-columns: 1fr 1fr min-content
     card:
       - padding: 0
-      - background: >
-          [[[
-          if(variables.highlight) {
-            return 'var(--primary-color)';
-          }
-          ]]]
     name:
       - font-size: var(--body-font-size)
       - padding: 4px 4px 12px 12px
@@ -103,14 +92,7 @@ room:
         - height: 20px
         - justify-self: start
         - padding: 8px
-        - color: >
-            [[[
-            if(variables.highlight) {
-              return 'white';
-            } else {
-              return 'var(--accent-color)';
-            }
-            ]]]
+        - color: 'var(--accent-color)'
       temperature:
         - font-size: 0.8rem
         - justify-self: end

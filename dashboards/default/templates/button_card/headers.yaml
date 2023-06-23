@@ -1,0 +1,11 @@
+header_h1:
+  template: header
+  styles:
+    name:
+      - font-size: 3rem
+
+header_h2:
+  template: header
+  styles:
+    name:
+      - text-transform: uppercase

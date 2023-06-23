@@ -1,0 +1,51 @@
+# lovelace_gen
+
+kiosk_mode:
+  hide_header: true
+
+background: "#1d2d36"
+button_card_templates: !include_dir_merge_named templates/button_card/
+
+views:
+
+    - !include views/home.yaml
+    - !include views/rooms.yaml
+    - !include views/devices/lights.yaml
+    - !include views/devices/media.yaml
+    - !include views/devices/climate.yaml
+    - !include views/security.yaml
+    - !include views/people.yaml
+    - !include views/energy.yaml
+    - !include views/devices.yaml
+
+# Room views
+{% for room in _global.rooms if not room.hidden %}
+
+    - !include 
+      - views/room.yaml
+      - room: {{ room }}
+
+  {% if "devices" in room %}
+
+    {% if "lights" in room.devices %}
+    - !include
+      - views/devices/lights.yaml
+      - room: {{ room }}
+    {% endif %}
+
+    {% if "media" in room.devices %}
+    - !include
+      - views/devices/media.yaml
+      - room: {{ room }}
+    {% endif %}
+    
+    {% if "climate" in room %}
+    - !include
+      - views/devices/climate.yaml
+      - room: {{ room }}
+    {% endif %}
+
+  {% endif %}
+    
+{% endfor %}
+

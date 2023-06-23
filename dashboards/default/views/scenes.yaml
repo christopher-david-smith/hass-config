@@ -1,3 +1,0 @@
-# lovelace_gen
-
-{% extends "dashboards/default/templates/page.yaml" %}

@@ -1,0 +1,60 @@
+devices:
+  triggers_update: all
+  variables:
+    entities: []
+    states: []
+    icon: null
+  show_label: true
+  styles:
+    grid:
+      - grid-template-areas: |
+          "icons . ."
+          "n n i"
+      - grid-template-columns: 1fr min-content
+    card:
+      - padding: 0
+    name:
+      - font-size: var(--body-font-size)
+      - padding: 4px 4px 12px 12px
+      - white-space: nowrap
+      - text-align: left
+      - justify-self: start
+      - align-self: end
+    img_cell:
+      - align-self: end
+      - text-align: right
+      - padding: 4px 8px 8px 8px
+      - height: 28px
+    icon:
+      - color: >
+          [[[
+            console.log(variables)
+            for (const entity of variables.entities) {
+              if(variables.states.includes(states[entity['entity']].state)) {
+                return 'var(--accent-color)';
+              }
+            }
+            return 'var(--light-gray-color)';
+          ]]]
+    custom_fields:
+      icons:
+        - height: 20px
+        - justify-self: start
+        - padding: 8px
+  custom_fields:
+    icons: >
+      [[[
+        var enabled_icons = [];
+        var disabled_icons = [];
+
+        for (const entity of variables.entities) {
+          if(variables.states.includes(states[entity['entity']].state)) {
+            enabled_icons.push('<ha-icon style="width: 15px; color: var(--accent-color)" icon="' + variables.icon + '"></ha-icon>');
+          } else {
+            disabled_icons.push('<ha-icon style="width: 15px; color: var(--light-grey-color)" icon="' + variables.icon + '"></ha-icon>');
+          }
+        }
+        var icons = enabled_icons.concat(disabled_icons); 
+        return icons.join(" ");
+      ]]]
+

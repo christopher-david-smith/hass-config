@@ -1,0 +1,44 @@
+# lovelace_gen
+
+title: Rooms 
+path: rooms 
+
+cards:
+  - type: vertical-stack
+    cards:
+
+      - !include 
+        - ../templates/dashboard/header.yaml
+        - name: Rooms
+
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout:
+          grid-template-columns: repeat(auto-fit, minmax(34%, 1fr))
+        cards:
+          {% for room in _global.rooms %}
+            {% if not room.hidden %}
+            - type: custom:button-card
+              template: room
+              name: {{ room.name }}
+              icon: {{ room.icon }}
+              tap_action:
+                action: navigate
+                navigation_path: {{ room.path }}
+              variables:
+                temperature: {% if room.climate %}{{ room.climate.temperature }}{% endif %}
+                entities:
+                  lights: {% if room.devices %}{{ room.devices.lights }}{% endif %}
+                  media: {% if room.devices %}{{ room.devices.media }}{% endif %}
+                  climate: {% if room.climate %}{{ room.climate.thermostat }}{% endif %}
+                  {% if room.devices %}
+                    {% if room.devices.other %}
+                  other:
+                      {% for item in room.devices.other %}
+                    - icon: {{ item.icon }}
+                      entity: {{ item.entity }}
+                      {% endfor %}
+                    {% endif %}
+                  {% endif %}
+            {% endif %}
+          {% endfor %}

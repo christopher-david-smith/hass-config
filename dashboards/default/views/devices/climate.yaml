@@ -1,0 +1,34 @@
+# lovelace_gen
+
+title: {% if room %}{{ room.name }} - {% endif %}Climate
+path: {% if room %}{{ room.path }}_{% endif %}climate
+
+cards:
+
+  - type: vertical-stack
+    cards:
+
+      - !include 
+        - ../../templates/dashboard/header.yaml
+        - name: {% if room %}{{ room.name }} - {% endif %}Climate
+
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout:
+          grid-template-columns: 50% 50%
+        cards:
+          - type: custom:mini-graph-card
+            name: Temperature
+            entities:
+              - sensor.living_room_current_temperature
+          - type: custom:mini-graph-card
+            name: Humidity
+            entities:
+              - sensor.living_room_current_humidity
+
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        cards:
+          - type: custom:mushroom-climate-card
+            entity: climate.living_room
+            show_temperature_control: true

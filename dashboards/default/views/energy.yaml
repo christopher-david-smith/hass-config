@@ -1,48 +1,50 @@
 # lovelace_gen
 
-{% extends "dashboards/default/templates/page.yaml" %}
+title: Energy 
+path: energy
 
-{% block cards %}
-- type: vertical-stack
-  cards:
-    - type: vertical-stack
-      cards: !include 
-        - ../templates/entities.yaml
-        - card: custom:mushroom-entity-card
-          items:
-            - sensor.smart_meter_electricity_cost_today
-            - sensor.smart_meter_gas_cost_today
-          card_options:
-            layout: vertical
-    
-    - type: custom:button-card
-      template: header_h3
-      name: Electricity
+cards:
 
-    - type: custom:mini-graph-card
-      show:
-        name: false
-        icon: false
-        graph: bar
-      entities:
-        - sensor.electricity_usage_hour
-      hours_to_show: 24
-      points_per_hour: 1
-      group_by: hour
-    
-    - type: custom:button-card
-      template: header_h3
-      name: Gas 
+  - type: vertical-stack
+    cards:
 
-    - type: custom:mini-graph-card
-      show:
-        name: false
-        icon: false
-        graph: bar
-      entities:
-        - sensor.gas_usage_hour
-      line_color: "#591421"
-      hours_to_show: 24
-      points_per_hour: 1
-      group_by: hour
-{% endblock %}
+      - !include
+        - ../templates/dashboard/header.yaml
+        - name: Energy
+
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout:
+          grid-template-columns: 50% 50%
+        cards:
+
+          - type: custom:mushroom-entity-card
+            entity: sensor.smart_meter_electricity_cost_today
+            name: "Electricity (Today)"
+
+          - type: custom:mushroom-entity-card
+            entity: sensor.smart_meter_gas_cost_today
+            name: "Gas (Today)"
+
+      - type: custom:layout-card
+        cards:
+          - type: custom:mini-graph-card
+            show:
+              icon: false
+              graph: bar
+            entities:
+              - sensor.electricity_usage_hour
+            hours_to_show: 24
+            points_per_hour: 1
+            group_by: hour
+
+          - type: custom:mini-graph-card
+            show:
+              icon: false
+              graph: bar
+            entities:
+              - sensor.gas_usage_hour
+            line_color: "#591421"
+            hours_to_show: 24
+            points_per_hour: 1
+            group_by: hour

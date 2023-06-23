@@ -1,4 +1,5 @@
 lovelace_gen:
+  
   people:
     - person.chris
     - person.bex
@@ -14,71 +15,83 @@ lovelace_gen:
       url: !secret camera_back_garden_right
 
   rooms:
+
     - name: "Living Room"
+      path: "living_room"
       icon: "mdi:sofa"
-      lights:
-        - light.living_room_light
-        - light.living_room_corner_light
-      media:
-        - media_player.living_room_tv
-        - media_player.living_room_speaker
-        - media_player.living_room_chromecast
-      thermostat:
-        - climate.living_room
-      temperature:
-        - sensor.living_room_current_temperature
+      devices:
+        lights:
+          - entity: switch.living_room_light_switch_right
+          - entity: switch.living_room_corner_light
+        media:
+          - entity: media_player.living_room_tv
+          - entity: media_player.living_room_speaker
+          - entity: media_player.living_room_chromecast
+      climate:
+        thermostat: climate.living_room
+        temperature: sensor.living_room_current_temperature
 
     - name: "Kitchen"
+      path: "kitchen"
       icon: "mdi:fridge"
-      media:
-        - media_player.kitchen_speaker
-      other:
-        - icon: mdi:coffee
-          entities:
-            - switch.kitchen_coffee_machine
-        - icon: mdi:dishwasher
-          name: Dishwasher
-          report_state_only: true
-          entities:
-            - input_boolean.dishwasher_running
+      devices:
+        media:
+          - entity: media_player.kitchen_speaker
+        other:
+          - entity: switch.kitchen_coffee_machine
+            icon: mdi:coffee
+          - entity: input_boolean.dishwasher_running
+            report_state_only: true
+            name: Dishwasher
+            icon: mdi:dishwasher
 
     - name: "Utility"
+      path: "utility"
       icon: "mdi:washing-machine"
-      other:
-        - icon: mdi:washing-machine
-          name: Washing Machine
-          report_state_only: true
-          entities:
-            - input_boolean.washing_machine_running
+      devices:
+        lights:
+          - entity: switch.utility_light_switch_right
+        other:
+          - entity: input_boolean.washing_machine_running
+            icon: mdi:washing-machine
+            name: Washing Machine
+            report_state_only: true
+
+    - name: "Downstairs Bathroom"
+      hidden: true
+      devices:
+        lights:
+          - entity: switch.utility_light_switch_left
 
     - name: "Bedroom"
+      path: "bedroom"
       icon: "mdi:bed"
-      thermostat:
-        - climate.bedroom
-      temperature:
-        - sensor.bedroom_current_temperature
+      climate:
+        thermostat: climate.bedroom
+        temperature: sensor.bedroom_current_temperature
 
     - name: "Bens room"
+      path: "bens_room"
       icon: "mdi:baby"
-      thermostat:
-        - climate.bens_room
-      temperature:
-        - sensor.bens_room_current_temperature
+      climate:
+        thermostat: climate.bens_room
+        temperature: sensor.bens_room_current_temperature
 
     - name: "Office"
+      path: "office"
       icon: "mdi:office-building"
-      lights:
-        - light.office_light
-      media:
-        - media_player.office_speaker
-      thermostat:
-        - climate.office
-      temperature:
-        - sensor.office_current_temperature
+      devices:
+        lights:
+          - entity: switch.office_light_switch
+        media:
+          - entity: media_player.office_speaker
+      climate:
+        thermostat: climate.office
+        temperature: sensor.office_current_temperature
 
     - name: "Guest Room"
+      path: "guest_room"
       icon: "mdi:bag-carry-on"
-      thermostat:
-        - climate.guest_room
-      temperature:
-        - sensor.guest_room_current_temperature
+      climate:
+        thermostat: climate.guest_room
+        temperature: sensor.guest_room_current_temperature

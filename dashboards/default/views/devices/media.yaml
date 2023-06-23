@@ -1,0 +1,41 @@
+# lovelace_gen
+
+title: {% if room %}{{ room.name }} - {% endif %}Media
+path: {% if room %}{{ room.path }}_{% endif %}media
+
+cards:
+
+  - type: vertical-stack
+    cards:
+
+      - !include 
+        - ../../templates/dashboard/header.yaml
+        - name: {% if room %}{{ room.name }} - {% endif %}Media
+
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout:
+          grid-template-columns: 50% 50% 
+        cards:
+
+            {% if room %}
+              {% for media in room.devices.media %}
+          - type: custom:mushroom-media-player-card 
+            entity: {{ media.entity }}
+            icon: {% if media.icon %}{{ media.icon }}{% else %}mdi:radio{% endif %}
+            name: {{ media.name }}
+              {% endfor %}
+            {% else %}
+              {% for room in _global.rooms %}
+                {% if "devices" in room %}
+                  {% if "media" in room.devices %}
+                    {% for media in room.devices.media%}
+          - type: custom:mushroom-media-player-card 
+            entity: {{ media.entity }}
+            icon: {% if media.icon %}{{ media.icon }}{% else %}mdi:radio{% endif %}
+            name: {{ media.name }}
+                  {% endfor %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            {% endif %}

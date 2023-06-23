@@ -1,0 +1,41 @@
+# lovelace_gen
+
+title: {% if room %}{{ room.name }} - {% endif %}Lights
+path: {% if room %}{{ room.path }}_{% endif %}lights
+
+cards:
+
+  - type: vertical-stack
+    cards:
+
+      - !include 
+        - ../../templates/dashboard/header.yaml
+        - name: {% if room %}{{ room.name }} - {% endif %}Lights
+
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout:
+          grid-template-columns: 50% 50% 
+        cards:
+
+            {% if room %}
+              {% for light in room.devices.lights %}
+          - type: custom:mushroom-light-card 
+            entity: {{ light.entity }}
+            icon: {% if light.icon %}{{ light.icon }}{% else %}mdi:lightbulb{% endif %}
+            name: {{ light.name }}
+              {% endfor %}
+            {% else %}
+              {% for room in _global.rooms %}
+                {% if "devices" in room %}
+                  {% if "lights" in room.devices %}
+                    {% for light in room.devices.lights %}
+          - type: custom:mushroom-light-card 
+            entity: {{ light.entity }}
+            icon: {% if light.icon %}{{ light.icon }}{% else %}mdi:lightbulb{% endif %}
+            name: {{ light.name }}
+                  {% endfor %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            {% endif %}
